@@ -20,7 +20,7 @@
  */
 const double mWeightThreshold = 0.7;
 
-/* Size of the prefix to be concidered by the Winkler modification. 
+/* Size of the prefix to be considered by the Winkler modification. 
  * Winkler's paper used a default value of 4
  */
 const int mNumChars = 4;
