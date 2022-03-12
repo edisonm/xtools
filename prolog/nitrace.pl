@@ -36,6 +36,7 @@
                     nitrace/1,
                     nitrace/3]).
 
+:- use_module(library(context_values)).
 :- use_module(library(ontrace)).
 :- use_module(library(prolog_clause), []).
 
@@ -60,7 +61,9 @@ frame_pi(Frame, PI) :-
 
 nitrace_port(Stream, Port, Frame, PC, ParentL, SubLoc, continue) :-
     ( maplist(frame_pi, ParentL, CS),
-      print_message(stream(Stream, SubLoc), frame(Frame, Port, PC, CS)),
+      with_context_values(
+          print_message(stream, frame(Frame, Port, PC, CS)),
+          [stream, location], [Stream, SubLoc]),
       fail
     ; true
     ).
@@ -69,8 +72,12 @@ nitrace_port(Stream, Port, Frame, PC, ParentL, SubLoc, continue) :-
     user:message_property/2,
     prolog:message//1.
 
-user:message_property(stream(Stream, _), stream(Stream)) :- !.
-user:message_property(stream(_, Loc), prefix(F-A)) :- !,
+user:message_property(stream, stream(Stream)) :-
+    !,
+    get_context_value(stream, Stream).
+user:message_property(stream, prefix(F-A)) :-
+    !,
+    get_context_value(location, Loc),
     '$messages':swi_location(Loc, [F1-A], []),
     atomic_list_concat(['~N', F1, '\t'], F).
 
