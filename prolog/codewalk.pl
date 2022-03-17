@@ -67,6 +67,14 @@ is_meta(on_head).
 %!  walk_code(:Options) is det.
 
 walk_code(MOptions) :-
+    setup_call_cleanup(
+        ( current_prolog_flag(xref, Old),
+          set_prolog_flag(xref, true)
+        ),
+        do_walk_code(MOptions),
+        set_prolog_flag(xref, Old)).
+
+do_walk_code(MOptions) :-
     meta_options(is_meta, MOptions, Options1),
     foldl(select_option_default,
           [method(Method)-clause],
