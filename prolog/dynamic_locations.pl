@@ -60,8 +60,7 @@ collect_dynamic_locations(M, MGoal, _, From) :-
 infer_dynl_if_required :-
     with_mutex(infer_dynl,
                ( \+ inferred_dynl
-               ->dynamic_locations([source(false),
-                                    infer_meta_predicates(false),
+               ->dynamic_locations([infer_meta_predicates(false),
                                     autoload(false),
                                     evaluate(false),
                                     trace_reference(_),
