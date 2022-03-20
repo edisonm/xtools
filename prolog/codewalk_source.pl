@@ -71,9 +71,9 @@ prepare(To, Undefined, p(TRef, GRef)) :-
     ( To \== (-)
     ->( var(To)
       ->assertz((system:goal_expansion(G, P, _, _) :-
-                       '$current_source_module'(M),
-                       once(do_goal_expansion(M, G, P)),
-                       fail), GRef)
+                     '$current_source_module'(M),
+                     once(do_goal_expansion(M, G, P)),
+                     fail), GRef)
       ; To = _:H
       ->functor(H, F, A),
         functor(G, F, A), % speed up goal expansion
