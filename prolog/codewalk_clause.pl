@@ -43,6 +43,7 @@
 :- use_module(library(assertions)).
 :- use_module(library(extend_args)).
 :- use_module(library(extra_location)).
+:- use_module(library(file_clause)).
 :- use_module(library(from_utils)).
 :- use_module(library(meta_args)).
 :- use_module(library(option_utils)).
@@ -129,29 +130,17 @@ walk_clause(FileD, Opts) :-
     option(trace_variables(TraceVars), Opts),
     option(from(From), Opts),
     option(concurrent(Concurrent), Opts),
-    Head = M:_,
+    From = clause(Ref),
+    collect_file_clause_db,
     cond_forall(
         Concurrent,
-        current_module(M),
-        forall(( current_head(Head),
-                 current_head_body(FileD, Head, Body, From)
+        get_dict(File, FileD, _),
+        forall(( file_clause(File, Head, Body, Ref),
+                 clause_property(Ref, module(CM))
                ),
                ( maplist(trace_var(Head), TraceVars),
-                 walk_head_body(Head, Body, Opts)
+                 walk_head_body(Head, CM:Body, Opts)
                ))).
-
-current_head(Head) :-
-    current_predicate(_, Head),
-    \+ predicate_property(Head, imported_from(_)),
-    predicate_property(Head, number_of_clauses(N)),
-    N > 0.
-
-current_head_body(FileD, Head, CM:Body, From) :-
-    From = clause(Ref),
-    catch(clause(Head, Body, Ref), _, fail),
-    from_to_file(From, File),
-    get_dict(File, FileD, _),
-    clause_property(Ref, module(CM)).
 
 trace_var(Head, non_fresh) :-
     term_variables(Head, Vars),
