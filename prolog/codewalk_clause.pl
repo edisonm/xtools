@@ -130,22 +130,21 @@ walk_clause(FileD, Opts) :-
     option(trace_variables(TraceVars), Opts),
     option(from(From), Opts),
     option(concurrent(Concurrent), Opts),
-    From = clause(Ref),
     collect_file_clause_db,
     cond_forall(
         Concurrent,
         get_dict(File, FileD, _),
-        forall(( file_clause(File, Head, Body, Ref),
-                 clause_property(Ref, module(CM))
-               ),
+        forall(file_clause(File, Head, Body, From),
                ( maplist(trace_var(Head), TraceVars),
-                 walk_head_body(Head, CM:Body, Opts)
+                 walk_head_body(Head, Body, Opts)
                ))).
 
-trace_var(Head, non_fresh) :-
+trace_var(Goal, TV) :- var_trace(TV, Goal).
+
+var_trace(non_fresh, Head) :-
     term_variables(Head, Vars),
     '$expand':mark_vars_non_fresh(Vars).
-trace_var(Head, meta_arg) :-
+var_trace(meta_arg, Head) :-
     mark_meta_arguments(Head).
 
 walk_head_body(Head, Body, Opts) :-
@@ -194,6 +193,7 @@ walk_called((A*->B), C, M, O) :-
     walk_called(A, C, M, O),
     walk_called(B, C, M, O).
 walk_called(\+(A), C, M, O) :-
+    !,
     \+ \+ walk_called(A, C, M, O).
 walk_called((A;B), C, M, O) :-
     !,

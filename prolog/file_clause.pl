@@ -41,22 +41,36 @@
 
 :- meta_predicate file_clause(+,?,?,-).
 
+%!  head_calls_hook(Head, Module, Body, File, Line)
+%
+%   Used to keep information that could be partially evaluated.
+%
+%  @tbd: it should be stored out of the executable, since its information is
+%  only relevant to the static analyzers
+
+:- multifile head_calls_hook/5.
+
 % warm up table:
 collect_file_clause_db :-
     with_mutex(file_clause, forall(file_clause(_, _, _, _), true)).
 
 :- table file_clause/4 as (subsumptive, shared).
 
-file_clause(File, Head, Body, Ref) :-
-    Head = M:_,
+file_clause(File, MHead, Body, From) :-
+    MHead = M:Head,
     From = clause(Ref),
     current_module(M),
-    current_head(Head),
-    catch(clause(Head, Body, Ref), _, fail),
-    from_to_file(From, File).
+    current_head(MHead),
+    catch(clause(MHead, RTBody, Ref), _, fail),
+    clause_property(Ref, module(CM)),
+    from_to_file(From, File),
+    from_to_line(From, Line),
+    ( head_calls_hook(Head, M, CTBody, File, Line)
+    ->Body = (CTBody, CM:RTBody)
+    ; Body = CM:RTBody
+    ).
 
-current_head(Head) :-
-    current_predicate(_, Head),
-    \+ predicate_property(Head, imported_from(_)),
-    predicate_property(Head, number_of_clauses(N)),
-    N > 0.
+current_head(MHead) :-
+    current_predicate(_, MHead),
+    \+ predicate_property(MHead, imported_from(_)),
+    predicate_property(MHead, number_of_clauses(_)).
