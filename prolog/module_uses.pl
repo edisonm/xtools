@@ -34,6 +34,7 @@
 
 :- module(module_uses,
           [ collect_module_uses/2,
+            module_uses/1,
             module_uses/2,
             module_uses/3,
             module_uses/4
