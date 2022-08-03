@@ -57,6 +57,7 @@ codewalk:walk_code(clause, Options1) :-
           [on_trace(OnTrace)-(codewalk:true_3),
            on_head(OnHead)-(codewalk:true_2),
            trace_reference(To)-To,
+           module(Module)-Module,
            undefined(Undefined)-ignore,
            trace_variables(TraceVars)-[],
            concurrent(Concurrent)-true,
@@ -69,6 +70,7 @@ codewalk:walk_code(clause, Options1) :-
     Data = data{from:_,
                 on_trace:OnTrace,
                 on_head:OnHead,
+                module:Module,
                 trace_variables:TraceVars,
                 trace_reference:To,
                 concurrent:Concurrent,
@@ -160,7 +162,8 @@ walk_head_body(Head, Body, _) :-
 walk_called_mod(G, C, M, CM, Opts) :-
     ( atom(M),
       atom(CM)
-    ->setup_call_cleanup(
+    ->ignore(option(module(CM), Opts, CM)),
+      setup_call_cleanup(
           ( '$current_source_module'(OldM),
             '$set_source_module'(CM)
           ),

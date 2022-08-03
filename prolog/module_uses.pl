@@ -33,8 +33,11 @@
 */
 
 :- module(module_uses,
-          [module_uses/2,
-           module_uses/3]).
+          [ collect_module_uses/2,
+            module_uses/2,
+            module_uses/3,
+            module_uses/4
+          ]).
 
 :- use_module(library(codewalk)).
 
@@ -44,27 +47,32 @@
 :- dynamic module_uses/4.
 
 module_uses(LoadedIn, Module, Uses) :-
-    module_uses_2(m(Module), LoadedIn, Uses).
+    collect_module_uses(LoadedIn, Module:_),
+    module_uses_2(m(LoadedIn, Module), Uses).
 
 module_uses(LoadedIn, Uses) :-
-    module_uses_2(all, LoadedIn, Uses).
+    collect_module_uses(LoadedIn, _),
+    module_uses_2(all(LoadedIn), Uses).
 
-trace_reference(all,  _).
-trace_reference(m(M), M:_).
+module_uses(Uses) :-
+    collect_module_uses(_, _),
+    module_uses_2(all, Uses).
 
-pattern(all,  PI, PI).
-pattern(m(M), M:F/A, F/A).
+pattern(m(_, M), _-(M:F/A),  F/A).
+pattern(all(_),       _-PI,   PI).
+pattern(all,          Pair, Pair).
 
-module_uses_2(Collector, LoadedIn, Uses) :-
-    trace_reference(Collector, TR),
-    pattern(Collector, M:F/A, Pattern),
+collect_module_uses(LoadedIn, TR) :-
     walk_code([module(LoadedIn),
                source(false),
                method(clause),
                trace_reference(TR),
                on_trace(collect_module_uses(LoadedIn))
-              ]),
-    findall(Pattern, retract(module_uses(LoadedIn, M, F, A)), UsesU),
+              ]).
+
+module_uses_2(Collector, Uses) :-
+    pattern(Collector, LoadedIn-(M:F/A), Pattern),
+    findall(Pattern, module_uses(LoadedIn, M, F, A), UsesU),
     sort(UsesU, Uses).
 
 :- public
@@ -74,4 +82,5 @@ collect_module_uses(LoadedIn, MGoal, _, _) :-
     strip_module(MGoal, _, Goal),
     functor(Goal, F, A),
     predicate_property(MGoal, implementation_module(Module)),
+    LoadedIn \= Module,
     assertz(module_uses(LoadedIn, Module, F, A)).
