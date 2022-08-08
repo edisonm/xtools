@@ -59,7 +59,7 @@ module_uses(Uses) :-
     collect_module_uses(_, _),
     module_uses_2(all, Uses).
 
-pattern(m(_, M), _-(M:F/A),  F/A).
+pattern(m(L, M), L-(M:F/A),  F/A).
 pattern(all(_),       _-PI,   PI).
 pattern(all,          Pair, Pair).
 
@@ -80,8 +80,8 @@ module_uses_2(Collector, Uses) :-
     collect_module_uses/4.
 
 collect_module_uses(LoadedIn, MGoal, _, _) :-
-    strip_module(MGoal, _, Goal),
-    functor(Goal, F, A),
     predicate_property(MGoal, implementation_module(Module)),
     LoadedIn \= Module,
+    strip_module(MGoal, _, Goal),
+    functor(Goal, F, A),
     assertz(module_uses(LoadedIn, Module, F, A)).
