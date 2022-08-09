@@ -35,10 +35,38 @@
 :- module(module_loops, [module_loops/2]).
 
 :- use_module(library(lists)).
+:- use_module(library(solution_sequences)).
 :- use_module(library(option_utils)).
 
 skip_module(user).
 skip_module(system).
+
+:- dynamic
+    loads_db/4.
+
+update_loads(FileD) :-
+    forall(( get_dict(File, FileD, _),
+             module_property(Module, file(File)),
+             '$load_context_module'(File, Context, _),
+             \+ skip_module(Context),
+             \+ loads_db(Context, Module, _, _)
+           ),
+           assertz(loads_db(Context, Module, [], 1))).
+
+update_loads_dep :-
+    update_loads_rec(1).
+
+update_loads_rec(N1) :-
+    succ(N1, N),
+    forall(( loads_db(C, I, _, 1),
+             loads_db(I, M, P1, N1),
+             \+ loads_db(C, M, _, _)
+           ),
+           assertz(loads_db(C, M, [I|P1], N))),
+    ( loads_db(_, _, _, N)
+    ->update_loads_rec(N)
+    ; true
+    ).
 
 %!  module_loops(-Loops, +Options) is det.
 %
@@ -47,57 +75,21 @@ skip_module(system).
 
 module_loops(Loops, Options) :-
     option_files(Options, FileD),
-    collect_dependencies(FileD, DepsL),
-    module_loops(DepsL, Loops, []).
+    update_loads(FileD),
+    update_loads_dep,
+    findall(Loop,
+            ( % this way to get the loop, allow us to see if there are several
+              % paths between two nodes:
+              loads_db(C, I, P1, _),
+              loads_db(I, C, P2, _),
+              intersection([C|P1], [I|P2], []),
+              append([C|P1], [I|P2], P),
+              normalize_loop(P, Loop)
+            ), List),
+    sort(List, Loops).
 
-collect_dependencies(FileD, DepsL) :-
-    findall(Module-LoadedInL,
-            ( get_dict(File, FileD, _),
-              module_property(Module, file(File)),
-              findall(LoadedIn,
-                      ( '$load_context_module'(File, LoadedIn, _),
-                        \+ skip_module(LoadedIn)
-                      ), LoadedInU),
-              sort(LoadedInU, LoadedInL),
-              LoadedInL \= []
-            ), DepsU),
-    sort(DepsU, DepsL).
-
-module_loops([]) --> [].
-module_loops([Module-LoadedInL|DepsL1]) -->
-    fold_module_loops(LoadedInL, [Module], DepsL1, DepsL),
-    module_loops(DepsL).
-
-module_loops(Module, Path1, DepsL1, DepsL) -->
-    ( {append(Left, [Module|_], Path1)}
-    ->{ Path = [Module|Left],
-        DepsL = DepsL1
-      },
-      [Path]
-    ; {select(Module-LoadedInL, DepsL1, DepsL2)}
-    ->fold_module_loops(LoadedInL, [Module|Path1], DepsL2, DepsL)
-    ; {DepsL = DepsL1}
-    ).
-
-fold_module_loops([],    _,    DepsL,  DepsL) --> [].
-fold_module_loops([M|L], Path, DepsL1, DepsL) -->
-    module_loops(M, Path, DepsL1, DepsL2),
-    fold_module_loops(L, Path, DepsL2, DepsL).
-
-/*
-% Original, raw algorithm:
-load_path(File, Path) :-
-    '$load_context_module'(File, Module, _),
-    module_property(Module, file(LoadedIn)),
-    load_path(LoadedIn, [File], Path).
-
-load_path(File, Path1, Path) :-
-    ( append(Left, [File|_], Path1)
-    ->reverse([File|Left], Rev),
-      Path = [File|Rev]
-    ; '$load_context_module'(File, Module, _),
-      \+ skip_module(Module),
-      module_property(Module, file(LoadedIn)),
-      load_path(LoadedIn, [File|Path1], Path)
-    ).
-*/
+normalize_loop(Loop, Norm) :-
+    once(order_by([asc(Norm)],
+                  ( append(Left, Right, Loop),
+                    append(Right, Left, Norm)
+                  ))).
