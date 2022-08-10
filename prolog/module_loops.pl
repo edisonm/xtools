@@ -45,10 +45,12 @@ skip_module(system).
     loads_db/4.
 
 update_loads(FileD) :-
-    forall(( get_dict(File, FileD, _),
-             module_property(Module, file(File)),
-             '$load_context_module'(File, Context, _),
-             \+ skip_module(Context),
+    forall(( order_by([asc(Context), asc(Module)],
+                      ( get_dict(File, FileD, _),
+                        module_property(Module, file(File)),
+                        '$load_context_module'(File, Context, _),
+                        \+ skip_module(Context)
+                      )),
              \+ loads_db(Context, Module, _, _)
            ),
            assertz(loads_db(Context, Module, [], 1))).
@@ -78,8 +80,9 @@ module_loops(Loops, Options) :-
     update_loads(FileD),
     update_loads_dep,
     findall(Loop,
-            ( % this way to get the loop, allow us to see if there are several
-              % paths between two nodes:
+            ( % this method allow us to see if there are several paths between
+              % two nodes without generating all of them, to avoid exponential
+              % explosion:
               loads_db(C, I, [], 1),
               loads_db(I, C, P2, _),
               normalize_loop([C, I|P2], Loop)
