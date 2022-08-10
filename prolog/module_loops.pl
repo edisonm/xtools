@@ -80,11 +80,9 @@ module_loops(Loops, Options) :-
     findall(Loop,
             ( % this way to get the loop, allow us to see if there are several
               % paths between two nodes:
-              loads_db(C, I, P1, _),
+              loads_db(C, I, [], 1),
               loads_db(I, C, P2, _),
-              intersection([C|P1], [I|P2], []),
-              append([C|P1], [I|P2], P),
-              normalize_loop(P, Loop)
+              normalize_loop([C, I|P2], Loop)
             ), List),
     sort(List, Loops).
 
