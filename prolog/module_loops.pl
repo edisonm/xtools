@@ -32,7 +32,11 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-:- module(module_loops, [module_loops/2]).
+:- module(module_loops,
+          [ update_loads_dep/0,
+            loads_db/4,
+            module_loops/2
+          ]).
 
 :- use_module(library(lists)).
 :- use_module(library(solution_sequences)).
@@ -62,6 +66,7 @@ update_loads_rec(N1) :-
     succ(N1, N),
     forall(( loads_db(C, I, _, 1),
              loads_db(I, M, P1, N1),
+             M \= C, % avoid loops
              \+ loads_db(C, M, _, _)
            ),
            assertz(loads_db(C, M, [I|P1], N))),
@@ -72,8 +77,8 @@ update_loads_rec(N1) :-
 
 %!  module_loops(-Loops, +Options) is det.
 %
-%   return the module loops, i.e., the module load chain that end up loading the
-%   module itself.
+%   Returns the module loops, i.e., the module load chain that ends up loading
+%   the module itself.
 
 module_loops(Loops, Options) :-
     option_files(Options, FileD),
