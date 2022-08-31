@@ -257,7 +257,7 @@ option_file(M, ML, File, OFile, Options) :-
     \+ ( member(ExDir, ExDirL),
          directory_file_path(ExDir, _, File)
        ),
-    ( ML \= []
+    ( ML \= (-)
     ->member(M, ML)
     ; true
     ),
@@ -318,7 +318,7 @@ option_collect(Name, Dict, Options1, Options) :-
            if(Loaded)-true,
            module_property(Prop)-[],
            module(M)-M,
-           modules(ML)-[],
+           modules(ML)-(-),
            extensions(EL)-(-),
            exclude_files(AExFileL)-[],
            exclude_dirs(ExADirL)-[],
