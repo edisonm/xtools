@@ -41,6 +41,7 @@
           ]).
 
 :- use_module(library(codewalk)).
+:- use_module(library(location_utils)).
 
 :- meta_predicate
     collect_module_uses(+,0,+,+).
@@ -79,9 +80,12 @@ module_uses_2(Collector, Uses) :-
 :- public
     collect_module_uses/4.
 
-collect_module_uses(LoadedIn, MGoal, _, _) :-
-    predicate_property(MGoal, implementation_module(Module)),
-    LoadedIn \= Module,
-    strip_module(MGoal, _, Goal),
-    functor(Goal, F, A),
-    assertz(module_uses(LoadedIn, Module, F, A)).
+collect_module_uses(M, MGoal, _, From) :-
+    record_location_meta(MGoal, M, From, all_call_refs, mu_caller_hook(M)).
+
+mu_caller_hook(M, Head, CM, _, _, _, _) :-
+    callable(Head),
+    nonvar(CM),
+    predicate_property(CM:Head, implementation_module(Module)),
+    functor(Head, F, A),
+    assertz(module_uses(M, Module, F, A)).
