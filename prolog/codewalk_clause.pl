@@ -86,13 +86,10 @@ walk_extras_(declaration,    FileD, Opts) :- walk_from_loc_declaration(FileD, Op
 walk_extras_(asrparts(L),    FileD, Opts) :- walk_from_assertion(      FileD, Opts, L).
 
 walk_from_initialization(FileD, Opts) :-
-    forall(( '$init_goal'(_File, Goal, SourceLocation),
-             ( SourceLocation = File:Line
-             ->get_dict(File, FileD, _),
-               From = file(File, Line, -1, _),
-               option(from(From), Opts)
-             ; true
-             )
+    forall(( '$init_goal'(_File, Goal, File:Line),
+             get_dict(File, FileD, _),
+             From = file(File, Line, -1, _),
+             option(from(From), Opts)
            ),
            walk_head_body('<initialization>', Goal, Opts)).
 
