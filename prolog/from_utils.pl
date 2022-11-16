@@ -34,6 +34,7 @@
 
 :- module(from_utils, [from_to_file/2,
                        from_to_line/2,
+                       from_to_module/2,
                        from_to_file_line_pos/5,
                        file_termpos_line/4,
                        update_fact_from/2,
@@ -80,6 +81,15 @@ from_to_file(clause(ClauseRef), File) :-
     clause_property(ClauseRef, file(File)).
 from_to_file(file_term_position(File, _), File).
 from_to_file(file(File, _, _, _), File).
+
+from_to_module(clause_term_position(ClauseRef, _), Module) :-
+    clause_property(ClauseRef, module(Module)).
+from_to_module(clause(ClauseRef), Module) :-
+    clause_property(ClauseRef, module(Module)).
+from_to_module(file_term_position(File, _), Module) :-
+    module_property(Module, file(File)).
+from_to_module(file(File, _, _, _), Module) :-
+    module_property(Module, file(File)).
 
 from_to_line(clause_term_position(ClauseRef, _), Line) :-
     clause_property(ClauseRef, line_count(Line)).
