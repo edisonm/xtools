@@ -158,11 +158,15 @@ walk_head_body(Head, Body, _) :-
 
 walk_called_mod(G, C, M, CM, Opts) :-
     ( atom(M),
-      atom(CM)
-    ->ignore(option(module(CM), Opts, CM)),
+      ( atom(CM)
+      ->NC = CM
+      ; var(CM) % We know the predicate being called, but not the context, assume user
+      ->NC = user
+      )
+    ->ignore(option(module(NC), Opts, NC)),
       setup_call_cleanup(
           ( '$current_source_module'(OldM),
-            '$set_source_module'(CM)
+            '$set_source_module'(NC)
           ),
           walk_called(G, C, M, Opts),
           '$set_source_module'(OldM))
@@ -173,9 +177,9 @@ walk_called(G, _, _, _) :-
     var(G),
     !.
 walk_called(true, _, _, _) :- !.
-walk_called(@(G,CM), C, _, Opts) :-
+walk_called(@(G,CM), C, N, Opts) :-
     !,
-    strip_module(CM:G, M, H),
+    strip_module(N:G, M, H),
     walk_called_mod(H, C, M, CM, Opts).
 walk_called(M:G, C, _, Opts) :-
     !,
