@@ -122,7 +122,10 @@ skip(_:_).
 
 check_file(File) :-
     current_context_value(file, File),
-    prolog_load_context(source, File).
+    % Note: we can not use prolog_load_context(source, File) since it could fail (bug???)
+    % prolog_load_context(source, File).
+    '$current_source_module'(M),
+    module_property(M, file(File)).
 
 do_term_expansion(Term) :-
     check_file(_),
@@ -139,6 +142,7 @@ check_trace_reference(To, M, Goal) :-
 do_goal_expansion(M, Goal, TermPos) :-
     check_file(File),
     \+ skip(Goal),
+    callable(Goal), % could be nonsense (before expansion)
     ( TermPos \= none
     ->From = file_term_position(File, TermPos)
     ; prolog_load_context(term_position, Pos),
@@ -163,21 +167,19 @@ do_source_walk_code(Options1) :-
               freeze(M, '$set_source_module'(M)),
               prepare(To, Undefined, Ref)
             ),
-            walk_source(M, File, [variable_names(VNL)|Options]),
+            walk_source(M, [variable_names(VNL)|Options]),
             ( '$set_source_module'(OldM),
               cleanup(Ref)
-            )),
-        [file, on_trace],
-        [File, OnTrace]).
+            )), [on_trace], [OnTrace]).
 
-walk_source(M, File, Options) :-
+walk_source(M, Options) :-
     option_module_files(Options, MFileD),
     forall(( get_dict(M, MFileD, FileD),
              get_dict(File, FileD, _)
            ),
            setup_call_cleanup(
                prolog_open_source(File, In),
-               fetch_term(In, Options),
+               with_context_value(fetch_term(In, Options), file, File),
                prolog_close_source(In))).
 
 fetch_term(In, Options1) :-
