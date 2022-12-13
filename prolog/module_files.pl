@@ -32,7 +32,12 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-:- module(module_files, [module_files/2, file_modules/2, module_file/2]).
+:- module(module_files,
+          [ module_files/2,
+            file_modules/2,
+            module_file/2,
+            file_module/2
+          ]).
 
 :- use_module(library(solution_sequences)).
 
@@ -43,11 +48,31 @@ module_files(M, Files) :-
 file_modules(File, ML) :-
     findall(M, distinct(M, module_file(M, File)), ML).
 
-module_file(M, File) :-
+module_file_1(M, File) :-
     module_property(M, file(File)).
-module_file(M, File) :-
+module_file_1(M, File) :-
     '$load_context_module'(File, M, _),
     \+ module_property(_, file(File)).
-module_file(M, Incl) :-
-    source_file_property(File, includes(Incl, _)),
-    module_file(M, File).
+
+module_file(M, File) :-
+    module_file_rec(module_file_1(M), File).
+
+module_file_rec(GetFile, File) :-
+    SC = s(fail),
+    ( call(GetFile, File),
+      nb_setarg(1, SC, true)
+    ; SC = s(true),
+      module_file_rec(get_incl_file(GetFile), File)
+    ).
+
+get_incl_file(GetFile, Incl) :-
+    distinct(Incl,
+             ( call(GetFile, File1),
+               source_file_property(File1, includes(Incl, _))
+             )).
+
+file_module(File, M) :-
+    (   distinct(File1, source_file_property(File1, includes(File, _)))
+    *-> file_module(File1, M)
+    ;   module_file_1(M, File)
+    ).
