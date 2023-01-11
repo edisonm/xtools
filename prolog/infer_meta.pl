@@ -41,9 +41,11 @@
 :- use_module(library(assrt_metainference)).
 
 infer_meta_predicates :-
-    prolog_walk_code([autoload(false),
-                      source(false),
-                      infer_meta_predicates(true)]).
+    prolog_walk_code([ autoload(false),
+                       source(false),
+                       infer_meta_predicates(all),
+                       walk_meta_predicates(false)
+                     ]).
 
 cleanup_inferred_meta :-
     retractall(prolog_metainference:inferred_meta_pred(_, _, _)).
@@ -51,8 +53,9 @@ cleanup_inferred_meta :-
 infer_meta_if_required :-
     with_mutex(infer_meta,
                ( predicate_property(prolog_metainference:inferred_meta_pred(_, _, _),
-                                    number_of_clauses(0 ))
-               ->infer_meta_assertions,
+                                    number_of_clauses(N)),
+                 N > 0
+               ->true
+               ; infer_meta_assertions,
                  infer_meta_predicates
-               ; true
                )).
