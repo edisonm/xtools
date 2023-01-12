@@ -43,8 +43,8 @@
 infer_meta_predicates :-
     prolog_walk_code([ autoload(false),
                        source(false),
-                       infer_meta_predicates(all),
-                       walk_meta_predicates(false)
+                       infer_meta_predicates(all)
+                       % walk_meta_predicates(false)
                      ]).
 
 cleanup_inferred_meta :-
