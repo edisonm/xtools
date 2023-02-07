@@ -50,8 +50,7 @@ cover_current_units :-
     working_directory(W,W),
     forall(plunit:current_test_set(Set),
            gcover(plunit:run_unit(Set), [tag(Set),
-                                         file(directory_file_path(W,_))])),
-    plunit:check_for_test_errors.
+                                         file(directory_file_path(W,_))])).
 
 cov_run_tests(Set) :-
     working_directory(W,W),
