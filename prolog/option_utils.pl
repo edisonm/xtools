@@ -184,7 +184,9 @@ process_fdirs(File, OFile, Options1) :-
         ; Options2 = [extensions(EL)|Options1]
         ),
         Params = source(Options2)
-      ; findall(F, module_file(_, F), LFileU),
+      ; % Note: here we can not use distinct(File, module_file(_, File)) because
+        % that will be too slow, instead we findall and deduplicate via sort/2
+        findall(F, module_file(_, F), LFileU),
         sort(LFileU, LFileL),
         Params = loaded(LFileL)
       ),
@@ -204,8 +206,6 @@ check_dir_file(source(Options), Dir, File) :-
     member(File, FileL).
 
 check_dir_file(loaded(FileL), Dir, File) :-
-    % Note: here we can not use distinct(File, module_file(_, File)) because
-    % that will be too slow, instead we findall and deduplicate via sort/2
     member(File, FileL),
     directory_file_path(Dir, _, File).
 
@@ -273,7 +273,7 @@ option_file(M, ML, File, OFile, Options) :-
              ))
     ; var(File)
     ->module_file(M, File)
-    ; once(module_file(M, File))
+    ; once(file_module(File, M))
     ),
     ( Prop \= []
     ->module_property(M, Prop)
