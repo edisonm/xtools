@@ -33,10 +33,10 @@
 */
 
 :- module(module_files,
-          [ module_files/2,
-            file_modules/2,
-            module_file/2,
-            file_module/2
+          [ module_file/2,
+            module_files/2,
+            file_module/2,
+            file_modules/2
           ]).
 
 :- use_module(library(solution_sequences)).
@@ -46,7 +46,7 @@ module_files(M, Files) :-
     findall(File, distinct(File, module_file(M, File)), Files).
 
 file_modules(File, ML) :-
-    findall(M, distinct(M, module_file(M, File)), ML).
+    findall(M, distinct(M, file_module(M, File)), ML).
 
 module_file_1(M, File) :-
     module_property(M, file(File)).
@@ -54,22 +54,26 @@ module_file_1(M, File) :-
     '$load_context_module'(File, M, _),
     \+ module_property(_, file(File)).
 
-module_file(M, File) :-
-    module_file_rec(module_file_1(M), File).
+%!  module_file(+Module, -File) is multi.
 
-module_file_rec(GetFile, File) :-
+module_file(M, File) :-
+    module_file_rec(module_file_1, M, File).
+
+module_file_rec(GetFile, M, File) :-
     SC = s(fail),
-    ( call(GetFile, File),
+    ( call(GetFile, M, File),
       nb_setarg(1, SC, true)
     ; SC = s(true),
-      module_file_rec(get_incl_file(GetFile), File)
+      module_file_rec(get_incl_file(GetFile), M, File)
     ).
 
-get_incl_file(GetFile, Incl) :-
+get_incl_file(GetFile, M, Incl) :-
     distinct(Incl,
-             ( call(GetFile, File1),
+             ( call(GetFile, M, File1),
                source_file_property(File1, includes(Incl, _))
              )).
+
+%!  file_module(+File, -Module) is multi.
 
 file_module(File, M) :-
     (   distinct(File1, source_file_property(File1, includes(File, _)))
