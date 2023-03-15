@@ -77,12 +77,13 @@ alias_files(AliasL, EL, Loaded, FileL, Options) :-
 check_file(true, File) :- access_file(File, exist).  % exist checked at the end to avoid premature fail
 check_file(loaded,  _).
 
-:- table module_file_/2 as subsumptive.
+% For some reason the next declaration was causing a performance bug --EMM
+% :- table module_file_/2 as subsumptive.
 
-module_file_(M, F) :- module_file(M, F).
+% module_file_(M, F) :- module_file(M, F).
 
 check_module(Module, File) :-
-    distinct(File, module_file_(Module, File)).
+    distinct(File, module_file(Module, File)).
 
 source_extension(Type, Ext) :-
     user:prolog_file_type(Ext, Type),
@@ -183,7 +184,7 @@ process_fdirs(File, OFile, Options1) :-
         ; Options2 = [extensions(EL)|Options1]
         ),
         Params = source(Options2)
-      ; findall(F, module_file_(_, F), LFileU),
+      ; findall(F, module_file(_, F), LFileU),
         sort(LFileU, LFileL),
         Params = loaded(LFileL)
       ),
@@ -262,17 +263,17 @@ option_file(M, ML, File, OFile, Options) :-
     ; true
     ),
     ( nonvar(M)
-    ->module_file_(M, File)
+    ->module_file(M, File)
     ; true = OFile.if,
       \+ ( var(M),
            var(File)
          )
-    ->ignore(( module_file_(M, File)
+    ->ignore(( module_file(M, File)
              ; M = (-)
              ))
     ; var(File)
-    ->module_file_(M, File)
-    ; once(module_file_(M, File))
+    ->module_file(M, File)
+    ; once(module_file(M, File))
     ),
     ( Prop \= []
     ->module_property(M, Prop)
