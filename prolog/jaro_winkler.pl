@@ -37,6 +37,7 @@
           ]).
 
 :- use_module(library(assertions)).
+:- use_module(library(typeprops)).
 :- use_module(library(foreign/foreign_interface)).
 :- use_module(library(foreign/foreign_props)).
 :- gen_foreign_library(plbin(libjaro_winkler)).
