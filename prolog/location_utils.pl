@@ -47,6 +47,7 @@
 :- use_module(library(static_strip_module)).
 :- use_module(library(compact_goal)).
 :- use_module(library(predicate_from)).
+:- init_expansors.
 
 from_location(From, Location) :-
     '$messages':swi_location(From, Location, []),

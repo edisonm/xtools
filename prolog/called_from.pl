@@ -53,6 +53,7 @@
 :- use_module(library(location_utils)).
 :- use_module(library(dynamic_locations)).
 :- use_module(library(from_utils)).
+:- init_expansors.
 
 :- multifile
     prolog:message//1.

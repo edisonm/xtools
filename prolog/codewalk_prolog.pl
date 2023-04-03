@@ -41,6 +41,7 @@
 :- use_module(library(extra_location)).
 :- use_module(library(option_utils)).
 :- use_module(library(from_utils)).
+:- init_expansors.
 
 :- thread_local
     issues/1.

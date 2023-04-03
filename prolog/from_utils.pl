@@ -46,6 +46,7 @@
 :- use_module(library(plprops)).
 :- use_module(library(extend_args)).
 :- use_module(library(filepos_line)).
+:- init_expansors.
 
 %!  from_to_file_line_pos(+Loc, -File, -CLine, ?TLine, ?Pos) is semidet.
 %

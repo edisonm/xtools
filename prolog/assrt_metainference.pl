@@ -39,6 +39,8 @@
 :- use_module(library(assertions)).
 :- use_module(library(transpose)).
 :- use_module(library(prolog_metainference), []).
+:- init_expansors.
+
 :- prolog_metainference:use_module(library(apply), [maplist/3]).
 
 applicable_type(calls).

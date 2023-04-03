@@ -48,6 +48,7 @@
 :- use_module(library(meta_args)).
 :- use_module(library(option_utils)).
 :- use_module(library(condconc)).
+:- init_expansors.
 
 :- multifile
     codewalk:walk_code/2.

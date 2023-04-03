@@ -40,6 +40,7 @@
 :- use_module(library(typeprops)).
 :- use_module(library(foreign/foreign_interface)).
 :- use_module(library(foreign/foreign_props)).
+:- init_expansors.
 :- gen_foreign_library(plbin(libjaro_winkler)).
 :- use_foreign_header('pl-jaro_winkler').
 :- use_foreign_source('pl-jaro_winkler').
