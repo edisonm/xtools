@@ -43,12 +43,12 @@
 cov_run_tests :-
     setup_call_cleanup(
         plunit:setup_trap_assertions(Ref),
-        cover_current_units,
-        plunit:report_and_cleanup(Ref)).
+        call_time(cover_current_units, Time),
+        plunit:report_and_cleanup(Ref, Time, [])).
 
 cover_current_units :-
     working_directory(W,W),
-    forall(plunit:current_test_set(Set),
+    forall(plunit:current_test_unit(Set, _),
            gcover(plunit:run_unit(Set), [tag(Set),
                                          file(directory_file_path(W,_))])).
 
