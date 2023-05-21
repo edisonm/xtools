@@ -9,6 +9,7 @@
 :- use_module(library(typeprops)).
 :- use_module(library(edinburgh)).
 :- use_module(library(mapnargs)).
+:- init_expansors.
 
 :- meta_predicate metapred(+,-,?,1).
 
