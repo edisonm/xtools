@@ -74,8 +74,8 @@ curr_alias_file(AliasL, EL, Loaded, File, Options1) :-
 alias_files(AliasL, EL, Loaded, FileL, Options) :-
     findall(File, curr_alias_file(AliasL, EL, Loaded, File, Options), FileL).
 
-check_file(true, File) :- access_file(File, exist).  % exist checked at the end to avoid premature fail
-check_file(loaded,  _).
+check_file(false, File) :- access_file(File, exist).  % exist checked at the end to avoid premature fail
+check_file(true,  _).
 
 % For some reason the next declaration was causing a performance bug --EMM
 % :- table module_file_/2 as subsumptive.
@@ -132,7 +132,7 @@ special(..).
 
 process_files(File, OFile, Options1) :-
     EL = OFile.extensions,
-    Loaded = OFile.if,
+    Loaded = OFile.loaded,
     Files = OFile.files,
     AFile = OFile.file,
     merge_options(Options1, [file_type(prolog)], Options),
@@ -153,7 +153,7 @@ process_files(File, OFile, Options1) :-
 process_exclude_files(ExFileL, OFile, Options1) :-
     merge_options(Options1, [file_type(prolog)], Options),
     EL = OFile.extensions,
-    Loaded = OFile.if,
+    Loaded = OFile.loaded,
     AExFileL = OFile.exclude_files,
     alias_files(AExFileL, EL, Loaded, ExFileL, Options).
 
@@ -163,7 +163,7 @@ process_exclude_fdirs(ExDirL, OFile, Options1) :-
     alias_files(ExADirL, -, true, ExDirL, Options).
 
 process_fdirs(File, OFile, Options1) :-
-    Loaded = OFile.if,
+    Loaded = OFile.loaded,
     Dirs = OFile.dirs,
     ADir = OFile.dir,
     merge_options([file_type(directory)], Options1, Options),
@@ -197,7 +197,7 @@ process_fdirs(File, OFile, Options1) :-
 
 % here, we need all the files, even if the option specifies only loaded
 % files, otherwise included files without clauses will be ignored
-% directory_source_files(Dir, FileL, [recursive(true), if(false)]),
+% directory_source_files(Dir, FileL, [recursive(true), loaded(false)]),
 
 check_dir_file(source(Options), Dir, File) :-
     directory_files(Dir, Files),
@@ -262,18 +262,14 @@ option_file(M, ML, File, OFile, Options) :-
     ->member(M, ML)
     ; true
     ),
-    ( nonvar(M)
-    ->module_file(M, File)
-    ; true = OFile.if,
-      \+ ( var(M),
-           var(File)
-         )
-    ->ignore(( module_file(M, File)
-             ; M = (-)
-             ))
-    ; var(File)
-    ->module_file(M, File)
-    ; once(file_module(File, M))
+    ( var(M),
+      nonvar(File)
+    ->(   file_module(File, M)
+      *-> true
+      ;   false = OFile.loaded,
+          M = (-) % File not loaded
+      )
+    ; module_file(M, File)
     ),
     ( Prop \= []
     ->module_property(M, Prop)
@@ -316,7 +312,7 @@ project_dict(mfile, _, MFileD, MFileD).
 option_collect(Name, Dict, Options1, Options) :-
     foldl(select_option_default,
           [module_files(MFileD)-(-),
-           if(Loaded)-true,
+           loaded(Loaded)-true,
            module_property(Prop)-[],
            module(M)-M,
            modules(ML)-(-),
@@ -330,7 +326,7 @@ option_collect(Name, Dict, Options1, Options) :-
 	   file( AFile)-AFile
           ], Options1, Options),
     ( MFileD == (-)
-    ->OFile = ofile{if:Loaded,
+    ->OFile = ofile{loaded:Loaded,
                     module_property:Prop,
                     modules:ML,
                     extensions:EL,
