@@ -130,7 +130,8 @@ check_file(File) :-
 do_term_expansion(Term) :-
     check_file(_),
     determine_caller(Term, Caller),
-    set_context_value(caller, Caller).
+    nb_set_context_value(caller, Caller),
+    fail.
 
 check_trace_reference(To, M, Goal) :-
     (   subsumes_term(To, M:Goal)
