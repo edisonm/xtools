@@ -177,7 +177,7 @@ process_fdirs(File, OFile, Options1) :-
       ->ADirL = [ADir]
       )
     ->alias_files(ADirL, -, true, DirL, Options),
-      ( Loaded = true
+      ( Loaded = false
       ->EL = OFile.extensions,
         ( EL = (-)
         ->Options2 = Options1
