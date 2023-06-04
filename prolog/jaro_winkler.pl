@@ -1,8 +1,8 @@
-/*  Part of Extended Libraries for SWI-Prolog
+/*  Part of Extended Tools for SWI-Prolog
 
     Author:        Edison Mera
     E-mail:        efmera@gmail.com
-    WWW:           https://github.com/edisonm/xlibrary
+    WWW:           https://github.com/edisonm/xtools
     Copyright (C): 2020, Process Design Center, Breda, The Netherlands.
     All rights reserved.
 

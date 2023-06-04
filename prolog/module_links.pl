@@ -2,7 +2,7 @@
 
     Author:        Edison Mera
     E-mail:        efmera@gmail.com
-    WWW:           https://github.com/edisonm/stchecks
+    WWW:           https://github.com/edisonm/xtools
     Copyright (C): 2022, Process Design Center, Breda, The Netherlands.
     All rights reserved.
 

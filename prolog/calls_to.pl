@@ -2,7 +2,7 @@
 
     Author:        Edison Mera
     E-mail:        efmera@gmail.com
-    WWW:           https://github.com/edisonm/stchecks
+    WWW:           https://github.com/edisonm/xtools
     Copyright (C): 2022, Process Design Center, Breda, The Netherlands.
     All rights reserved.
 
@@ -149,13 +149,6 @@ record_head_deps(Head, From) :-
     forall(calls_to_hook(Head, From, M, Called),
            record_calls_to(Head, M, Called)).
 
-mark_compile_time_called :-
-    forall(distinct(M:H,
-                    ( compile_time_called(H, M, C),
-                      M \= C
-                    )),
-           check_unused:put_mark('<exported>'(M:H))).
-
 collect_calls_to(Options1, MFileD) :-
     foldl(select_option_default,
           [method(Method1)-clause],
@@ -176,5 +169,4 @@ collect_calls_to(Options1, MFileD) :-
                    on_head(record_head_deps)
                   ], Options),
     option_module_files(Options, MFileD),
-    walk_code([module_files(MFileD)|Options]),
-    mark_compile_time_called.
+    walk_code([module_files(MFileD)|Options]).
