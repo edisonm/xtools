@@ -50,6 +50,7 @@
 :- use_module(library(extend_args)).
 :- use_module(library(static_strip_module)).
 :- use_module(library(persistency), []).
+:- use_module(library(interface)).
 :- init_expansors.
 
 :- create_prolog_flag(check_database_preds, false, [type(boolean)]).
