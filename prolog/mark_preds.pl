@@ -44,6 +44,7 @@
 :- use_module(library(qualify_meta_goal)).
 :- use_module(library(calls_to)).
 :- use_module(library(compilation_module)).
+:- use_module(library(solution_sequences)).
 :- init_expansors.
 
 :- dynamic
