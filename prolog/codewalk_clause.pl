@@ -281,10 +281,10 @@ walk_called_by([], _, _, _).
 walk_called_by([H|T], C, CM, O) :-
     (   H = G+N
     ->  (   extend(G, N, G1, O)
-        ->  walk_called(@(G1,CM), C, CM, O)
+        ->  walk_called(G1, C, CM, O)
         ;   true
         )
-    ;   walk_called(@(H,CM), C, CM, O)
+    ;   walk_called(H, C, CM, O)
     ),
     walk_called_by(T, C, CM, O).
 
