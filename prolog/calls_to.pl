@@ -125,8 +125,7 @@ cu_caller_hook(Caller, Head, CM, Type, Goal, _, From) :-
     ; Caller = '<assertion>'(A:H),
       member(Goal, [ foreign_props:fimport(_),
                      foreign_props:fimport(_, _),
-                     foreign_props:tgen(_),
-                     foreign_props:sgen(_)
+                     foreign_props:tgen(_)
                    ])
     ->( A \= CM
       ->record_calls_to('<exported>', A, H)
