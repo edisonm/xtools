@@ -162,8 +162,9 @@ database_dec_fact(PRetractall, M, Fact) :-
     atom_concat(retractall_, Name, PName),
     functor(PRetractall, PName, Arity).
 
-database_retract_fact(retract(A),  system,     F) :- clause_head(A, F).
-database_retract_fact(lretract(A), pce_config, F) :- clause_head(A, F).
+database_retract_fact(retract(A),      system,     F) :- clause_head(A, F).
+database_retract_fact(retract_near(A), near_utils, F) :- clause_head(A, F).
+database_retract_fact(lretract(A),     pce_config, F) :- clause_head(A, F).
 database_retract_fact(PRetract, M, Fact) :-
     persistency:persistent(M, Fact, _),
     functor(Fact, Name, Arity),
