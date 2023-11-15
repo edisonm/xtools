@@ -66,7 +66,7 @@ file_clause(File, MHead, Body, From) :-
     from_to_file(From, File),
     from_to_line(From, Line),
     ( head_calls_hook(Head, M, CTBody, File, Line)
-    ->Body = (CTBody, CM:RTBody)
+    ->Body = CM:(CTBody, RTBody)
     ; Body = CM:RTBody
     ).
 
