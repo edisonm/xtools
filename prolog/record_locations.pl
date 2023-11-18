@@ -34,6 +34,7 @@
 
 :- module(record_locations, [record_location/0]).
 
+:- use_module(library(filesex)).
 :- use_module(library(extra_location)). % shold be the first
 :- use_module(library(apply)).
 :- use_module(library(filepos_line)).
@@ -223,9 +224,14 @@ have_extra_location(From1, H, M, Type) :-
     extra_location(H, M, Type, From),
     subsumes_from(From1, From).
 
+in_swipl_home(File) :-
+    current_prolog_flag(home, Dir),
+    directory_file_path(Dir, _, File).
+
 system:term_expansion(Term, Pos, [Term|Clauses], Pos) :-
     record_location,
     source_location(File, Line),
+    \+ in_swipl_home(File),
     ( rl_tmp(File, Line, _)
     ->fail
     ; retractall(rl_tmp(_, _, _)),
@@ -249,6 +255,7 @@ rl_goal_expansion(Goal, Pos) :-
     callable(Goal),
     \+ redundant(Goal),
     source_location(File, Line),
+    \+ in_swipl_home(File),
     ( rl_tmp(File, Line, Flag)
     ->Flag == 1
     ; true
