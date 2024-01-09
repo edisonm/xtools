@@ -38,25 +38,27 @@
           ]).
 
 :- use_module(library(from_utils)).
+:- use_module(library(track_deps)).
+:- init_expansors.
+
+% NOTE: don`t use table, since it is not working at expected:
+% :- table file_clause/4 as (subsumptive, shared).
+
+:- dynamic file_clause/4.
+:- volatile file_clause/4.
 
 :- meta_predicate file_clause(+,?,?,-).
 
-%!  head_calls_hook(Head, Module, Body, File, Line)
-%
-%   Used to keep information that could be partially evaluated.
-%
-%  @tbd: it should be stored out of the executable, since its information is
-%  only relevant to the static analyzers
-
-:- multifile head_calls_hook/5.
-
 % warm up table:
 collect_file_clause_db :-
-    with_mutex(file_clause, forall(file_clause(_, _, _, _), true)).
+    with_mutex(collect_file_clause, do_collect_file_clause_db).
 
-:- table file_clause/4 as (subsumptive, shared).
+do_collect_file_clause_db :-
+    retractall(file_clause(_, _, _, _)),
+    forall(gen_file_clause(F, H, B, L),
+           assertz(file_clause(F, H, B, L))).
 
-file_clause(File, MHead, Body, From) :-
+gen_file_clause(File, MHead, Body, From) :-
     MHead = M:Head,
     From = clause(Ref),
     current_module(M),
