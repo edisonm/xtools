@@ -134,10 +134,13 @@ walk_clause(FileD, Opts) :-
     cond_forall(
         Concurrent,
         get_dict(File, FileD, _),
+        walk_clause_file(File, TraceVars, From, Opts)).
+
+walk_clause_file(File, TraceVars, From, Opts) :-
         forall(file_clause(File, Head, Body, From),
                ( maplist(trace_var(Head), TraceVars),
                  walk_head_body(Head, Body, Opts)
-               ))).
+               )).
 
 trace_var(Goal, TV) :- var_trace(TV, Goal).
 
@@ -218,7 +221,8 @@ walk_called(Goal, C, M, O) :-
     walk_called_3(Goal, C, M, O),
     fail.
 walk_called(Goal, C, M, O) :-
-    ignore(walk_called_ontrace(Goal, C, M, O)),
+    % \+/1 to revert unintended bindings:
+    ignore(\+ walk_called_ontrace(Goal, C, M, O)),
     option(trace_variables(TraceVars), O),
     maplist(trace_var(M:Goal), TraceVars).
 

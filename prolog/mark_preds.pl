@@ -94,13 +94,17 @@ is_marked(CRef) :-
     marked(Term),
     subsumes_term(Term, CRef).
 
+check_and_mark(CRef) :-
+    \+ is_marked(CRef),
+    record_marked(CRef).
+
 put_mark(CRef) :-
-    ( \+ is_marked(CRef)
-    ->record_marked(CRef),
-      forall(( calls_to(CRef, w, CM, Callee),
-               predicate_property(CM:Callee, implementation_module(M))
+    ( with_mutex(check_and_mark, check_and_mark(CRef))
+    ->forall(( calls_to(CRef, w, CM, Callee),
+               strip_module(CM:Callee, M, H),
+               predicate_property(M:H, implementation_module(IM))
              ),
-             mark_rec(Callee, M))
+             mark_rec(H, IM))
     ; true
     ).
 
