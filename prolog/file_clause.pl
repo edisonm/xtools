@@ -38,6 +38,7 @@
           ]).
 
 :- use_module(library(from_utils)).
+:- use_module(library(list_sequence)).
 :- use_module(library(track_deps)).
 :- init_expansors.
 
@@ -58,6 +59,8 @@ do_collect_file_clause_db :-
     forall(gen_file_clause(F, H, B, L),
            assertz(file_clause(F, H, B, L))).
 
+match_head(Head, Head-Body) --> [Body].
+
 gen_file_clause(File, MHead, Body, From) :-
     MHead = M:Head,
     From = clause(Ref),
@@ -67,10 +70,11 @@ gen_file_clause(File, MHead, Body, From) :-
     clause_property(Ref, module(CM)),
     from_to_file(From, File),
     from_to_line(From, Line),
-    ( head_calls_hook(Head, M, CTBody, File, Line)
-    ->Body = (CTBody, CM:RTBody)
-    ; Body = CM:RTBody
-    ).
+    findall(Head-CTBody,
+            head_calls_hook(Head, M, CTBody, File, Line),
+            Pairs),
+    foldl(match_head(Head), Pairs, List, [CM:RTBody]),
+    list_sequence(List, Body).
 
 current_head(MHead) :-
     current_predicate(_, MHead),
