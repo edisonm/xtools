@@ -79,4 +79,5 @@ gen_file_clause(File, MHead, Body, From) :-
 current_head(MHead) :-
     current_predicate(_, MHead),
     \+ predicate_property(MHead, imported_from(_)),
+    MHead \= track_deps:head_calls_hook(_, _, _, _, _),
     predicate_property(MHead, number_of_clauses(_)).
