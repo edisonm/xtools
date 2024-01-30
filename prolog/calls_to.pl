@@ -145,8 +145,14 @@ collect_unused(M, MGoal, Caller, From) :-
 
 :- public record_head_deps/2.
 record_head_deps(Head, From) :-
-    forall(calls_to_hook(Head, From, M, Called),
-           record_calls_to(Head, M, Called)).
+    forall(calls_to_hook(Head, From, C, Called),
+           ( predicate_property(C:Called, implementation_module(M)),
+             record_calls_to(Head, C, Called),
+             ( C \= M
+             ->record_calls_to('<exported>', M, Called)
+             ; true
+             )
+           )).
 
 collect_calls_to(Options1, MFileD) :-
     foldl(select_option_default,
