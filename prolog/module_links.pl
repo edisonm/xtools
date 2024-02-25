@@ -38,7 +38,7 @@
             loop_to_chain/2,
             module_pred_chains/6,
             module_pred_links/2,
-            module_uses/3,
+            link_module_uses/3,
             preds_uses/3,
             update_depends_of/0,
             cleanup_depends_of/0
@@ -199,7 +199,7 @@ preds_uses(Module, PIL, RIL) :-
 
 % Like module_uses/3 in [library(module_uses)], but using depends_of_db/6 database:
 
-module_uses(LoadedIn, Module, Uses) :-
+link_module_uses(LoadedIn, Module, Uses) :-
     findall(F/A, module_uses(LoadedIn, Module, F, A), Uses).
 
 module_uses(LoadedIn, Module, F, A) :-
