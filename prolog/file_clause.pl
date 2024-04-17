@@ -37,6 +37,7 @@
             file_clause/4
           ]).
 
+:- use_module(library(apply)).
 :- use_module(library(from_utils)).
 :- use_module(library(list_sequence)).
 :- use_module(library(track_deps)).

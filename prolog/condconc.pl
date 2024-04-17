@@ -37,7 +37,7 @@
             cond_maplist/3
           ]).
 
-
+:- use_module(library(apply)).
 :- use_module(library(thread)).
 % :- use_module(library(conc_forall)).
 

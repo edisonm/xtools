@@ -34,6 +34,8 @@
 
 :- module(codewalk_source, []).
 
+:- use_module(library(apply)).
+:- use_module(library(lists)).
 :- use_module(library(prolog_source)).
 :- use_module(library(prolog_xref), []).
 :- use_module(library(context_values)).

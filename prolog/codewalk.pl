@@ -37,6 +37,7 @@
 :- multifile
     walk_code/2.
 
+:- use_module(library(apply)).
 :- use_module(library(option)).
 :- use_module(library(option_utils)).
 

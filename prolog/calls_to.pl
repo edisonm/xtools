@@ -41,6 +41,7 @@
            calls_to_hook/4
           ]).
 
+:- use_module(library(apply)).
 :- use_module(library(solution_sequences)).
 :- use_module(library(option)).
 :- use_module(library(lists)).
