@@ -39,6 +39,7 @@
           
 :- use_module(library(plunit)).
 :- use_module(library(gcover)).
+:- use_module(library(statistics)).
 
 cov_run_tests :-
     setup_call_cleanup(

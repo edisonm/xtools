@@ -41,6 +41,7 @@
            linked_arg/2]).
 
 :- use_module(library(codewalk)).
+:- use_module(library(option)).
 
 :- dynamic
     clause_db/1,

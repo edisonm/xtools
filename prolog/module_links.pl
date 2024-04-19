@@ -44,6 +44,7 @@
             cleanup_depends_of/0
           ]).
 
+:- use_module(library(apply)).
 :- use_module(library(lists)).
 :- use_module(library(calls_to)).
 :- use_module(library(solution_sequences)).

@@ -34,6 +34,7 @@
 
 :- module(tabulator, [tabulate/3, align/4]).
 
+:- use_module(library(apply)).
 :- use_module(library(lists)).
 
 tabulate(FillChar, Table1, Table) :-

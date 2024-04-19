@@ -32,15 +32,19 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-:- module(gcover, [gcover/2,
-                   covered_db/6,
-                   reset_cover/0,
-                   reset_cover/1,
-                   loc_file_line/4]).
+:- module(gcover,
+          [ gcover/2,
+            covered_db/6,
+            reset_cover/0,
+            reset_cover/1,
+            loc_file_line/4
+          ]).
 
 :- use_module(library(filepos_line)).
 :- use_module(library(module_files)).
 :- use_module(library(ontrace)).
+:- use_module(library(option)).
+:- use_module(library(prolog_source)).
 :- use_module(library(ntabling)).
 
 :- table loc_file_line/4.

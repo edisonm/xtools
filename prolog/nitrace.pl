@@ -36,6 +36,7 @@
                     nitrace/1,
                     nitrace/3]).
 
+:- use_module(library(apply)).
 :- use_module(library(context_values)).
 :- use_module(library(ontrace)).
 :- use_module(library(prolog_clause), []).

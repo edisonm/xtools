@@ -35,6 +35,7 @@
 :- module(ws_source, []).
 
 :- reexport(library(ws_browser)).
+:- use_module(library(pairs)).
 :- use_module(library(http/html_write)).
 :- use_module(library(module_files)).
 :- use_module(library(pldoc/doc_htmlsrc)).

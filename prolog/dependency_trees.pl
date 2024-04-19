@@ -34,6 +34,8 @@
 
 :- module(dependency_trees, [dependency_trees/3]).
 
+:- use_module(library(apply)).
+
 :- meta_predicate dependency_trees(2,+,-).
         
 :- thread_local dependency_tree_done/2.

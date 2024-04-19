@@ -29,6 +29,8 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 :- use_module(library(assoc)).
+:- use_module(library(apply)).
+:- use_module(library(pairs)).
 
 nodes_arcs_sccs(Ns, As, Ss) :-
         % must_be(list(ground), Ns),

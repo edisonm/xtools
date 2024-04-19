@@ -38,6 +38,7 @@
 
 :- use_module(library(dependency_trees)).
 :- use_module(library(read_file)).
+:- use_module(library(solution_sequences)).
 
 packs_trees(PackL, TreeL) :-
     dependency_trees(pack_dep, PackL, TreeL).
