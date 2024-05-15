@@ -35,6 +35,7 @@
 :- module(file_includes, [file_includes/3]).
 
 :- use_module(library(aggregate)).
+:- use_module(library(lists)).
 
 file_includes(File, Incl, Time) :-
     aggregate_all(set(I-T), source_file_property(File, includes(I, T)), L),

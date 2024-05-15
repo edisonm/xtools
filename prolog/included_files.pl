@@ -34,6 +34,7 @@
 
 :- module(included_files, [included_files/3]).
 
+:- use_module(library(lists)).
 :- use_module(library(solution_sequences)).
 
 includes(Files) -->

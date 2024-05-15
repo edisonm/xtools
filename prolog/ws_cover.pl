@@ -38,6 +38,7 @@
 :- use_module(library(ntabling)).
 :- use_module(library(apply)).
 :- use_module(library(gcover)).
+:- use_module(library(lists)).
 :- use_module(library(pairs)).
 :- use_module(library(solution_sequences)).
 :- use_module(library(http/html_write)).

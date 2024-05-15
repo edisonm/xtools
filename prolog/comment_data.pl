@@ -34,6 +34,8 @@
 
 :- module(comment_data, [comment_data/2, enable/0, disable/0]).
 
+:- use_module(library(lists)).
+
 :- dynamic
        comment_data/2,
        enabled/0.

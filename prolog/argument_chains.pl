@@ -41,6 +41,7 @@
            linked_arg/2]).
 
 :- use_module(library(codewalk)).
+:- use_module(library(lists)).
 :- use_module(library(option)).
 
 :- dynamic

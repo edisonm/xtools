@@ -37,6 +37,7 @@
           ]).
 
 :- use_module(library(dependency_trees)).
+:- use_module(library(lists)).
 :- use_module(library(read_file)).
 :- use_module(library(solution_sequences)).
 
