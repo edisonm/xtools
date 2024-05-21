@@ -256,12 +256,15 @@ rl_goal_expansion(Goal, Pos) :-
     \+ redundant(Goal),
     source_location(File, Line),
     \+ in_swipl_home(File),
-    ( rl_tmp(File, Line, Flag)
-    ->Flag == 1
-    ; true
+    ( nb_current('$term', Term)
+    ->( rl_tmp(File, Line, Flag)
+      ->Flag == 1
+      ; true
+      ),
+      memberchk(Term, [(:-_), []])
+    ; % if '$term' is not defined, then is if(...), or elif(...)
+      true
     ),
-    nb_current('$term', Term),
-    memberchk(Term, [(:-_), []]),
     \+ clause(declaration_pos(Goal, _, _, _, _, _, _), _),
     \+ skip_record_decl(Goal),
     assert_position(Goal, Pos, goal),
