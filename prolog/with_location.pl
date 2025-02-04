@@ -40,6 +40,7 @@
 
 :- meta_predicate with_location(+, 0 ).
 
+with_location([], Goal) :- !, Goal.
 with_location(From, Goal) :-
     from_to_file(From, File),
     from_to_line(From, Line),
