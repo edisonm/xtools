@@ -83,10 +83,16 @@ from_to_file(clause(ClauseRef), File) :-
 from_to_file(file_term_position(File, _), File).
 from_to_file(file(File, _, _, _), File).
 
+clause_module(ClauseRef, Module) :-
+    % is not this: (may be a bug in SWI-Prolog?)
+    % clause_property(ClauseRef, module(Module)),
+    clause_property(ClauseRef, file(File)),
+    module_property(Module, file(File)).
+
 from_to_module(clause_term_position(ClauseRef, _), Module) :-
-    clause_property(ClauseRef, module(Module)).
+    clause_module(ClauseRef, Module).
 from_to_module(clause(ClauseRef), Module) :-
-    clause_property(ClauseRef, module(Module)).
+    clause_module(ClauseRef, Module).
 from_to_module(file_term_position(File, _), Module) :-
     module_property(Module, file(File)).
 from_to_module(file(File, _, _, _), Module) :-

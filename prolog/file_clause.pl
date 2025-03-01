@@ -41,6 +41,7 @@
 :- use_module(library(from_utils)).
 :- use_module(library(list_sequence)).
 :- use_module(library(track_deps)).
+:- use_module(library(cohesive)).
 :- init_expansors.
 
 % NOTE: don`t use table, since it is not working at expected:
@@ -65,13 +66,20 @@ match_head(Head, Head-Body) --> [Body].
 gen_file_clause(File, MHead, Body, From) :-
     MHead = M:Head,
     From = clause(Ref),
-    current_module(M),
-    current_head(MHead),
-    catch(clause(MHead, RTBody, Ref), _, fail),
+    ( current_module(M),
+      current_head(MHead),
+      catch(clause(MHead, RTBody, Ref), _, fail),
+      from_to_file(From, File)
+    ; cohesive:( '$cohesive'(Head, IM),
+                 aux_cohesive_pred(Head, _CohM, _Scope, HExt)
+               ),
+      catch(clause(IM:HExt, RTBody, Ref), _, fail),
+      from_to_file(From, File),
+      module_property(M, file(File))
+    ),
     clause_property(Ref, module(CM)),
-    from_to_file(From, File),
     from_to_line(From, Line),
-    findall(Head-(Head=Pred,B),
+    findall(Head-(Head=Pred, B),
             head_calls_hook(Pred, M, B, File, Line),
             Pairs),
     foldl(match_head(Head), Pairs, List, [CM:RTBody]),
