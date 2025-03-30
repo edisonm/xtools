@@ -65,11 +65,10 @@ decl_caller(_,                 '<declaration>').
 
 :- public
     check_trace_reference/3,
-    do_term_expansion/1,
     do_goal_expansion/3,
-    determine_caller/2.
+    determine_caller/1.
 
-prepare(To, Undefined, p(TRef, GRef)) :-
+prepare(To, Undefined, p(GRef)) :-
     ( To \== (-)
     ->( var(To)
       ->assertz((system:goal_expansion(G, P, _, _) :-
@@ -96,18 +95,9 @@ prepare(To, Undefined, p(TRef, GRef)) :-
                    once(do_goal_expansion(M, G, P)),
                    fail), GRef)
     ; true
-    ),
-    ( nonvar(GRef)
-    ->assertz((system:term_expansion(T, P, T, P) :-
-               do_term_expansion(T)), TRef)
-    ; true
     ).
 
-cleanup(p(TRef, GRef)) :-
-    ( nonvar(TRef)
-    ->erase(TRef)
-    ; true
-    ),
+cleanup(p(GRef)) :-
     ( nonvar(GRef)
     ->erase(GRef)
     ; true
@@ -129,11 +119,9 @@ check_file(File) :-
     '$current_source_module'(M),
     module_property(M, file(File)).
 
-do_term_expansion(Term) :-
-    check_file(_),
-    determine_caller(Term, Caller),
-    nb_set_context_value(caller, Caller),
-    fail.
+determine_caller(Caller) :-
+    nb_current('$term', Term),
+    determine_caller(Term, Caller).
 
 check_trace_reference(To, M, Goal) :-
     (   subsumes_term(To, M:Goal)
@@ -153,7 +141,7 @@ do_goal_expansion(M, Goal, TermPos) :-
       From = file(File, Line, -1, _)
     ),
     current_context_value(on_trace, OnTrace),
-    current_context_value(caller,   Caller),
+    determine_caller(Caller),
     call(OnTrace, M:Goal, Caller, From).
 
 do_source_walk_code(Options1) :-
