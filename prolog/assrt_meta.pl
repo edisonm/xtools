@@ -94,11 +94,11 @@ am_head_prop_idx(Flag, Head, M, Meta, From) :-
     meta_has_mode_info(Meta),
     ( Flag = all
     ->
-      \+ ( prop_asr(Head, M, check, _, _, _, Asr),
+      \+ ( prop_asr(Head, M, check, _, _, _, _, Asr),
            prop_asr(glob, no_meta_modes(_), _, Asr)
          )
     ; Flag = specific
-    ->once(( prop_asr(Head, M, check, _, _, _, Asr),
+    ->once(( prop_asr(Head, M, check, _, _, _, _, Asr),
              prop_asr(glob, meta_modes(_), _, Asr)
            ))
     ),
