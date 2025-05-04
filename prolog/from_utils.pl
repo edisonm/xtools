@@ -43,7 +43,7 @@
 :- use_module(library(prolog_clause),   []).
 :- use_module(library(extra_messages),  []).
 :- use_module(library(assertions)).
-:- use_module(library(plprops)).
+:- use_module(library(globprops)).
 :- use_module(library(extend_args)).
 :- use_module(library(filepos_line)).
 :- init_expansors.
