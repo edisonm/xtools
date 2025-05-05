@@ -32,13 +32,27 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-:- module(record_locations, [record_location/0]).
+:- module(record_locations,
+          [ record_location/0
+          ]).
 
 :- use_module(library(filesex)).
-:- use_module(library(extra_location)). % shold be the first
+:- use_module(extra_location). % shold be the first
+:- use_module(library(prolog_codewalk), []).
 :- use_module(library(apply)).
-:- use_module(library(filepos_line)).
+
+/** <module> Record locations
+
+Be careful since this module MUST not depend on others, otherwise such extra
+locations in the dependent modules will not be recorded, that is why we avoid the
+usage of the next two libraries:
+
+```
 :- use_module(library(from_utils)).
+:- use_module(library(filepos_line)).
+```
+
+*/
 
 :- multifile
     system:term_expansion/4,
@@ -193,12 +207,15 @@ assert_position(H, M, Type, TermPos) :-
     compile_aux_clauses(Clauses).
 
 assert_position(H, M, Type, TermPos) -->
+    % resolve TermPos to file/4 term because later the source code will not be
+    % available and therefore we will not be able to get LinePos
     { source_location(File, Line1),
       ( nonvar(TermPos)
       ->arg(1, TermPos, Chars),
-        filepos_line(File, Chars, Line, LinePos)
-        % Meld TermPos because later the source code will not be available and
-        % therefore we will not be able to get LinePos
+        setup_call_cleanup(
+            '$push_input_context'(rl_filepos_line),
+            (prolog_codewalk:filepos_line(File, Chars, Line, LinePos)),
+            '$pop_input_context')
       ; Line = Line1,
         LinePos = -1
       )
@@ -206,23 +223,10 @@ assert_position(H, M, Type, TermPos) -->
     assert_location(H, M, Type, File, Line, file(File, Line, LinePos, Chars)).
 
 assert_location(H, M, Type, File, Line, From) -->
-    ( {\+ have_extra_location(From, H, M, Type)}
+    ( {\+ extra_location(H, M, Type, From)}
     ->['$source_location'(File, Line):extra_location:loc_declaration(H, M, Type, From)]
     ; []
     ).
-
-/*
-have_extra_location(file(File, Line, _, _), H, M, Type) :- !,
-    extra_location(H, M, Type, From),
-    from_to_file(From, File),
-    from_to_line(From, Line).
-have_extra_location(From, H, M, Type) :-
-    extra_location(H, M, Type, From).
-*/
-
-have_extra_location(From1, H, M, Type) :-
-    extra_location(H, M, Type, From),
-    subsumes_from(From1, From).
 
 in_swipl_home(File) :-
     current_prolog_flag(home, Dir),
