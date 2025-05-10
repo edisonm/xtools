@@ -38,6 +38,7 @@
            cleanup_inferred_meta/0]).
 
 :- use_module(library(prolog_codewalk)).
+:- use_module(library(extra_location)).
 :- use_module(library(assrt_metainference)).
 
 infer_meta_predicates :-
@@ -50,6 +51,15 @@ infer_meta_predicates :-
 cleanup_inferred_meta :-
     retractall(prolog_metainference:inferred_meta_pred(_, _, _)).
 
+infer_meta_null_decls :-
+    forall(( loc_declaration(Spec, M, (meta_predicate), _),
+             \+ predicate_property(M:Spec, meta_predicate(_))
+           ),
+           ( functor(Spec, F, A),
+             functor(Head, F, A),
+             assertz(prolog_metainference:inferred_meta_pred(Head, M, Spec))
+           )).
+
 infer_meta_if_required :-
     with_mutex(infer_meta,
                ( predicate_property(prolog_metainference:inferred_meta_pred(_, _, _),
@@ -57,5 +67,6 @@ infer_meta_if_required :-
                  N > 0
                ->true
                ; infer_meta_assertions,
+                 infer_meta_null_decls,
                  infer_meta_predicates
                )).
