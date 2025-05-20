@@ -33,13 +33,18 @@
 */
 
 :- module(infer_meta,
-          [infer_meta_predicates/0,
+          [infer_meta/0,
            infer_meta_if_required/0,
            cleanup_inferred_meta/0]).
 
 :- use_module(library(prolog_codewalk)).
 :- use_module(library(extra_location)).
 :- use_module(library(assrt_metainference)).
+
+infer_meta :-
+    infer_meta_assertions,
+    infer_meta_null_decls,
+    infer_meta_predicates.
 
 infer_meta_predicates :-
     prolog_walk_code([ autoload(false),
@@ -66,7 +71,5 @@ infer_meta_if_required :-
                                     number_of_clauses(N)),
                  N > 0
                ->true
-               ; infer_meta_assertions,
-                 infer_meta_null_decls,
-                 infer_meta_predicates
+               ; infer_meta
                )).
