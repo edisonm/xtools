@@ -47,6 +47,7 @@
 :- use_module(library(from_utils)).
 :- use_module(library(meta_args)).
 :- use_module(library(option_utils)).
+:- use_module(library(with_location)).
 :- use_module(library(condconc)).
 :- init_expansors.
 
@@ -154,7 +155,7 @@ walk_head_body(Head, Body, Opts) :-
     option(on_head(OnHead), Opts),
     option(from(From), Opts),
     ignore(call(OnHead, Head, From)),
-    walk_called(Body, Head, user, Opts),
+    with_location(From, walk_called(Body, Head, user, Opts)),
     !.
 walk_head_body(Head, Body, _) :-
     writeln(user_error, walk_head_body(Head, Body, -)),
