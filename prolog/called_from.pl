@@ -62,11 +62,11 @@
 :- dynamic called_from_db/5.
 
 prolog:message(acheck(called_from(MsgLoc, Args))) -->
-        MsgLoc,
-        ['~w called from ~w'-Args].
+    MsgLoc,
+    ['~w called from ~w'-Args].
 
 called_from(Ref) :-
-        called_from(Ref, _).
+    called_from(Ref, _).
 
 called_from(Ref, Caller) :-
     ( called_from(Ref, _CM, Caller, [], Sorted),
@@ -110,11 +110,12 @@ current_used_from(DynTypes, H, M, CM, From, Caller) :-
     ( called_from_db(H, M, CM, Caller, From)
     ; loc_dynamic(H, M, dynamic(Type, CM, Caller), From),
       memberchk(Type, DynTypes)
-    ; loc_declaration(H, CM, goal, From),
+    ; Caller = '<declaration>',
+      loc_declaration(H, CM, goal, From),
       predicate_property(CM:H, implementation_module(M))
-    ; curr_prop_asr(head, CM:H, From, _),
-      predicate_property(CM:H, implementation_module(M)),
-      Caller = '<assertion>'(M:H)
+    ; Caller = '<assertion>'(M:H),
+      curr_prop_asr(head, CM:H, From, _),
+      predicate_property(CM:H, implementation_module(M))
     ).
 
 :- public collect_call_point/6.
