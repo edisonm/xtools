@@ -2,7 +2,7 @@
 /* Original implementation can be found here:
  * https://stackoverflow.com/questions/19123506/jaro-winkler-distance-algorithm-in-c-sharp
  */
-
+#include <stdio.h>
 #include <string.h>
 #include "pl-jaro_winkler.h"
 
@@ -41,16 +41,16 @@ double distance(char *const aString1, char *const aString2)
 
 typedef char bool;
 
-/// <summary>
-/// Returns the Jaro-Winkler distance between the specified  
-/// strings. The distance is symmetric and will fall in the 
-/// range 0 (no match) to 1 (perfect match). 
-/// </summary>
-/// <param name="aString1">First String</param>
-/// <param name="aString2">Second String</param>
-/// <returns></returns>
 double proximity(char *const aString1, char *const aString2)
 {
+    if (aString1==NULL) {
+	return aString2!=NULL;
+    }
+
+    if (aString2==NULL) {
+	return 1;
+    }
+    
     int lLen1 = strlen(aString1);
     int lLen2 = strlen(aString2);
     if (lLen1 == 0)

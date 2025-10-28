@@ -47,5 +47,5 @@
 
 :- style_check(-singleton).
 
-:- pred [jw_distance(+atm:String1, +atm:String2, -num:Dist)+returns(Dist)
+:- pred [jw_distance(+atmstr:String1, +atmstr:String2, -num:Dist)+returns(Dist)
         ] is (det, foreign(distance)).
