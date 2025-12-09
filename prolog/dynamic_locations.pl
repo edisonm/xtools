@@ -33,11 +33,12 @@
 */
 
 :- module(dynamic_locations,
-          [dynamic_locations/1,
-           infer_dynl_if_required/0,
-           infer_location_dynamic/3,
-           inferred_dynl/0,
-           cleanup_dynl_db/0
+          [ dynamic_locations/1,
+            infer_dynl_if_required/0,
+            infer_dynl_if_required/1,
+            infer_location_dynamic/3,
+            inferred_dynl/0,
+            cleanup_dynl_db/0
           ]).
 
 :- use_module(library(option)).
@@ -47,24 +48,28 @@
 :- dynamic
     inferred_dynl/0.
 
-dynamic_locations(Options) :-
-    option(module(M), Options, M), % Be careful, this is required to let M be
-                                   % unified with the current module, specially
-                                   % if method is prolog.
-    walk_code([source(false), on_trace(collect_dynamic_locations(M))|Options]).
+dynamic_locations(Options1) :-
+    % Be careful, next is required to let M be unified with the current module
+    select_option(module(M), Options1, Options, M),
+    walk_code([source(false), module(M), on_trace(collect_dynamic_locations(M))|Options]).
 
 :- public collect_dynamic_locations/4.
 collect_dynamic_locations(M, MGoal, _, From) :-
     record_location_dynamic(MGoal, M, From).
 
 infer_dynl_if_required :-
+    infer_dynl_if_required([]).
+
+infer_dynl_if_required(Opts1) :-
+    merge_options([ infer_meta_predicates(false),
+                    autoload(false),
+                    evaluate(false),
+                    trace_reference(_),
+                    module_class([user, system, library])
+                  ], Opts1, Opts),
     with_mutex(infer_dynl,
                ( \+ inferred_dynl
-               ->dynamic_locations([infer_meta_predicates(false),
-                                    autoload(false),
-                                    evaluate(false),
-                                    trace_reference(_),
-                                    module_class([user, system, library])]),
+               ->dynamic_locations(Opts),
                  assertz(inferred_dynl)
                ; true
                )).
