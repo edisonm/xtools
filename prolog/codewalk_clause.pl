@@ -138,10 +138,10 @@ walk_clause(FileD, Opts) :-
         walk_clause_file(File, TraceVars, From, Opts)).
 
 walk_clause_file(File, TraceVars, From, Opts) :-
-        forall(file_clause(File, Head, Body, From),
-               ( maplist(trace_var(Head), TraceVars),
-                 walk_head_body(Head, Body, Opts)
-               )).
+    forall(file_clause(File, Head, Body, From),
+           ( maplist(trace_var(Head), TraceVars),
+             walk_head_body(Head, Body, Opts)
+           )).
 
 trace_var(Goal, TV) :- var_trace(TV, Goal).
 
@@ -168,8 +168,7 @@ walk_called_mod(G, C, M, CM, Opts) :-
       ; var(CM) % We know the predicate being called, but not the context, assume user
       ->NC = user
       )
-    ->ignore(option(module(NC), Opts, NC)),
-      setup_call_cleanup(
+    ->setup_call_cleanup(
           ( '$current_source_module'(OldM),
             '$set_source_module'(NC)
           ),
@@ -237,6 +236,7 @@ walk_called_ontrace(Goal, Caller, M, Opts) :-
     ;   predicate_property(M:Goal, implementation_module(M2)),
         subsumes_term(To, M2:Goal)
     ),
+    ignore(option(module(M), Opts, M)),
     option(on_trace(OnTrace), Opts),
     option(from(From), Opts),
     call(OnTrace, M2:Goal, Caller, From).

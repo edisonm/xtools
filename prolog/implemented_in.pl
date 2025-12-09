@@ -40,5 +40,5 @@
 implemented_in(MGoal) :-
     infer_dynl_if_required,
     forall(implemented_in(MGoal, From, Args),
-           print_message(information, at_location(From,
-                                                  implemented_in(Args)))).
+           print_message(information,
+                         at_location(From, implemented_in(Args)))).
