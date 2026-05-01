@@ -127,6 +127,10 @@ database_def_fact(asserta_with_names(A, _),  ifprolog,   F) :- clause_head(A, F)
 database_def_fact(assertz_with_names(A, _),  ifprolog,   F) :- clause_head(A, F).
 database_def_fact(lasserta(A),               pce_config, F) :- clause_head(A, F).
 database_def_fact(assert_cyclic(A),          plunit,     F) :- clause_head(A, F).
+database_def_fact(ld_asserta(A),          local_dynamic, F) :- clause_head(A, F).
+database_def_fact(ld_asserta(_, A),       local_dynamic, F) :- clause_head(A, F).
+database_def_fact(ld_assertz(A),          local_dynamic, F) :- clause_head(A, F).
+database_def_fact(ld_assertz(_, A),       local_dynamic, F) :- clause_head(A, F).
 database_def_fact(assert(A),                 system,     F) :- clause_head(A, F).
 database_def_fact(assert(A, _),              system,     F) :- clause_head(A, F).
 database_def_fact(asserta(A),                system,     F) :- clause_head(A, F).
@@ -150,6 +154,8 @@ database_dec_fact(abolish(F, A),             system,     H) :- fa_to_head(F, A, 
 database_dec_fact(abolish(PI),               system,     H) :- pi_to_head(PI, H).
 database_dec_fact(retractall(F),             system,     F).
 database_dec_fact(retractall_near(F),        near_utils, F).
+database_dec_fact(ld_retractall(F),       local_dynamic, F).
+database_dec_fact(ld_retractall(_, F),    local_dynamic, F).
 database_dec_fact(forall(A, B),              system,     F) :-
     subsumes_term(forall(retract(F), true), forall(A, B)),
     A=retract(F).
@@ -162,9 +168,11 @@ database_dec_fact(PRetractall, M, Fact) :-
     atom_concat(retractall_, Name, PName),
     functor(PRetractall, PName, Arity).
 
-database_retract_fact(retract(A),      system,     F) :- clause_head(A, F).
-database_retract_fact(retract_near(A), near_utils, F) :- clause_head(A, F).
-database_retract_fact(lretract(A),     pce_config, F) :- clause_head(A, F).
+database_retract_fact(retract(A),       system,        F) :- clause_head(A, F).
+database_retract_fact(retract_near(A),  near_utils,    F) :- clause_head(A, F).
+database_retract_fact(lretract(A),      pce_config,    F) :- clause_head(A, F).
+database_retract_fact(ld_retract(A),    local_dynamic, F) :- clause_head(A, F).
+database_retract_fact(ld_retract(_, A), local_dynamic, F) :- clause_head(A, F).
 database_retract_fact(PRetract, M, Fact) :-
     persistency:persistent(M, Fact, _),
     functor(Fact, Name, Arity),
@@ -178,6 +186,8 @@ database_query_fact(fact_near(A),       near_utils, F) :- clause_head(A, F).
 database_query_fact(fact_near(A, _),    near_utils, F) :- clause_head(A, F).
 database_query_fact(call_ref(A, _),     call_ref,   F) :- clause_head(A, F).
 database_query_fact(call_ref(A, _, _),  call_ref,   F) :- clause_head(A, F).
+database_query_fact(ld_call(A),      local_dynamic, F) :- clause_head(A, F).
+database_query_fact(ld_call(_, A),   local_dynamic, F) :- clause_head(A, F).
 
 pi_to_head(PI, H) :- nonvar(PI) -> PI=F/A, fa_to_head(F, A, H) ; true.
 
