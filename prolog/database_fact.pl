@@ -108,6 +108,7 @@ database_fact(mod, Goal, Fact) :- database_mod_fact(Goal, Fact).
 % ortogonal operations:
 database_fact_ort(def,     G, M, F) :- database_def_fact(G, M, F).
 database_fact_ort(dec,     G, M, F) :- database_dec_fact(G, M, F).
+database_fact_ort(declare, G, M, F) :- database_declare_fact(G, M, F).
 database_fact_ort(retract, G, M, F) :- database_retract_fact(G, M, F).
 database_fact_ort(query,   G, M, F) :- database_query_fact(G, M, F).
 
@@ -167,6 +168,26 @@ database_dec_fact(PRetractall, M, Fact) :-
     functor(Fact, Name, Arity),
     atom_concat(retractall_, Name, PName),
     functor(PRetractall, PName, Arity).
+
+ddf_wld(ML, MH) :-
+    nonvar(ML),
+    !,
+    dd_wld(ML, MH).
+dd_wld(M:L, M:H) :-
+    !,
+    dd_wld(L, H).
+dd_wld(L, H) :-
+    nonvar(L),
+    member(E, L),
+    pi_to_head(E, H).
+
+database_declare_fact(M:H, F) :- database_declare_fact(H, M, F).
+
+database_declare_fact(dynamic(A),                   system,        F) :- clause_head(A, F).
+database_declare_fact(thread_local(A),              system,        F) :- clause_head(A, F).
+database_declare_fact(volatile(A),                  system,        F) :- clause_head(A, F).
+database_declare_fact(with_local_dynamic(ML, _),    local_dynamic, H) :- ddf_wld(ML, H).
+database_declare_fact(with_local_dynamic(ML, _, _), local_dynamic, H) :- ddf_wld(ML, H).
 
 database_retract_fact(retract(A),       system,        F) :- clause_head(A, F).
 database_retract_fact(retract_near(A),  near_utils,    F) :- clause_head(A, F).
