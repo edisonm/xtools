@@ -181,8 +181,6 @@ dd_wld(L, H) :-
     member(E, L),
     pi_to_head(E, H).
 
-database_declare_fact(M:H, F) :- database_declare_fact(H, M, F).
-
 database_declare_fact(dynamic(A),                   system,        F) :- clause_head(A, F).
 database_declare_fact(thread_local(A),              system,        F) :- clause_head(A, F).
 database_declare_fact(volatile(A),                  system,        F) :- clause_head(A, F).
