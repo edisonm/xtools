@@ -136,9 +136,14 @@ gen_lit_marks(MG, clause(Clause)) :-
     clause_property(Clause, file(_)).    % Static clauses only
 gen_lit_marks(G, P) :- copy_term(G, P). % copy term to avoid undesirable bindings
 
+:- multifile skip_head_hook/2.
+
 :- meta_predicate match_head_clause(0, -).
-match_head_clause(MH, Clause) :-
-    catch(clause(MH, _, Clause), _, fail).
+match_head_clause(M:H, Clause) :-
+    \+ ( predicate_property(M:H, implementation_module(IM)),
+         skip_head_hook(H, IM)
+       ),
+    catch(clause(M:H, _, Clause), _, fail).
 
 mark_compile_time_called :-
     forall(distinct(M:H,
