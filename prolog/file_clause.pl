@@ -80,9 +80,8 @@ gen_file_clause(File, MHead, Body, From) :-
     clause_property(Ref, module(CM)),
     from_to_line(From, Line),
     findall(Head-(Head=Pred, B),
-            ( head_calls_hook(Pred, M, B, File, Line),
-              \+ Head \= Pred
-            ), Pairs),
+            head_calls_hook(Pred, M, B, File, Line),
+            Pairs),
     foldl(match_head(Head), Pairs, List, [CM:RTBody]),
     list_sequence(List, Body).
 
