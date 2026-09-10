@@ -79,7 +79,9 @@ gen_file_clause(File, MHead, Body, From) :-
     ),
     clause_property(Ref, module(CM)),
     from_to_line(From, Line),
-    findall(Head-(Head=Pred, B),
+    % Note: Using ignore/1 because it could be that Head has been expanded and
+    % no longer match with Pred --EM
+    findall(Head-(ignore(Head=Pred), B),
             head_calls_hook(Pred, M, B, File, Line),
             Pairs),
     foldl(match_head(Head), Pairs, List, [CM:RTBody]),
